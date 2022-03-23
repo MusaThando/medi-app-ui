@@ -1,0 +1,35 @@
+﻿@model MedicalAppUI.Models.CDisease
+@if(Model.DiseaseList.Count > 0)
+{
+	<table class="table table-sm table-border-horizontal" id="searchResultsTable">
+		<tbody>
+			@for (var k = 0; k < Model.DiseaseList.Count; k++)
+			{
+				<tr>
+					<td hidden>@Model.DiseaseList[k].DiagnosisGUIDfld</td>
+					<td>@Model.DiseaseList[k].ICD10Codefld</td>
+					<td>@Model.DiseaseList[k].DiagnosisDescriptionfld</td>
+					<td>
+						<button class="btn btn-sm btn-primary btnSelect" id="@Model.DiseaseList[k].DiagnosisGUIDfld">
+							Select
+						</button>
+					</td>
+				</tr>
+			}		
+			
+		</tbody>
+	</table>
+	
+}
+else
+{
+		<table class="table table-sm table-border-horizontal" id="searchResultsTable">
+			<tbody>
+				<tr>
+					<td><h5 class="text-center">No Results found</h5></td>
+				</tr>
+			</tbody>
+		</table>
+
+}
+

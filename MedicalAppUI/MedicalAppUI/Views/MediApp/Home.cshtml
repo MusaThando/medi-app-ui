@@ -1,0 +1,108 @@
+﻿
+<style>
+
+    .cardContent {
+        border-top: 4px solid #0D3562;
+        border-bottom: 4px solid #d9534f;
+        border-radius: 25px;
+        height: 180px;
+        transition: transform .3s;
+        cursor: pointer;
+        margin-bottom: 15px;
+    }
+
+
+    .card-body:hover {
+        transform: scale(1.1)
+    }
+</style>
+
+@if (ViewBag.UserType == "User")
+{
+    <div class="row pt-3 pb-5 ">
+        <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnProfile" onclick="window.location = '/MediApp/Profile'">
+                <h4 class="text-black-50 text-center">Profile Management</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnDocuments" onclick="window.location = '/MediApp/Documents'">
+                <h4 class="text-black-50 text-center">Document Uploads / Downloads</h4>
+            </div>
+        </div>
+    </div>
+}
+else if (ViewBag.UserType == "Doctor")
+{
+
+    <div class="row pt-3 pb-5 ">
+        <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnProfile" onclick="window.location = '/MediApp/Profile'">
+                <h4 class="text-black-50 text-center">Profile Management</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnDocuments" onclick="window.location = '/MediApp/Documents'">
+                <h4 class="text-black-50 text-center">Document Uploads / Downloads</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row pb-5 ">
+
+        <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnUserManagement" onclick="window.location = '/MediApp/Users'">
+                <h4 class="text-black-50 text-center">User(s) Management</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnDoctorManagement" onclick="window.location = '/MediApp/Doctors'">
+                <h4 class="text-black-50 text-center">Doctor(s) Management</h4>
+            </div>
+        </div>
+          <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnTransactionManagement" onclick="window.location = '/MediApp/Transaction'">
+                <h4 class="text-black-50 text-center"> Transactions(s) Management</h4>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+
+    <div class="row pt-3 pb-5 ">
+        <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnProfile" onclick="window.location = '/MediApp/Profile'">
+                <h4 class="text-black-50 text-center">Profile Management</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnDocuments" onclick="window.location = '/MediApp/Documents'">
+                <h4 class="text-black-50 text-center">Document Uploads / Downloads</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnUserManagement" onclick="window.location = '/MediApp/Users'">
+                <h4 class="text-black-50 text-center">User(s) Management</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row pb-5 ">
+        <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnDoctorManagement" onclick="window.location = '/MediApp/Doctors'">
+                <h4 class="text-black-50 text-center">Doctor(s) Management</h4>
+            </div>
+        </div>
+            <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnTransactionManagement" onclick="window.location = '/MediApp/Transaction'">
+                <h4 class="text-black-50 text-center"> Transactions(s) Management</h4>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-body bg-white shadow p-5 cardContent" id="btnApplicationAdmin" onclick="window.location = '/MediApp/Administration'">
+                <h4 class="text-black-50 text-center">Application Administration</h4>
+            </div>
+        </div>
+    </div>
+}
+
+

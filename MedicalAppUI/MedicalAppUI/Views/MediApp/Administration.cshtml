@@ -1,0 +1,541 @@
+﻿@model MedicalAppUI.Models.CViewModel
+@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .btnAddAdmin {
+        background: #198754;
+        color: white;
+    }
+
+    #hiddenAdminTable {
+        display: none;
+    }
+    table.dataTable.table thead th, table.dataTable.table thead td {
+        position: relative;
+        color: white;
+        background: #214A7A;
+    }
+    #AdminTable {
+        border-bottom: 4px solid red;
+    }
+    @@media only screen and (max-width: 760px) , (min-device-width: 768px) and (max-device-width: 1024px) {
+        #AdminTable, #AdminTable_wrapper {
+            display: none
+        }
+
+        #hiddenAdminTable {
+            display: block
+        }
+    }
+</style>
+<script>
+     $(function () {
+
+         $("#Contactfld").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            var regex = /^[0-9_ ]+$/;
+
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError").html("Contact field only allows numerical input.");
+            }
+
+            return isValid;
+        });
+        $("#IDNumberfld").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            var regex = /^[0-9_ ]+$/;
+
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError").html("ID Number field only allows numerical input.");
+            }
+
+            return isValid;
+        });
+
+        
+    });
+
+
+
+
+     $(document).on("click", "#btnDone", function () {
+        $("#transactionSuccessModal").modal("hide");
+         window.location= "/MediApp/Transaction";
+     });
+
+    $(document).on("click", "#btnErrorDone", function () {
+        $("#errorModal").modal("hide");
+        window.location= "/MediApp/Transaction";
+    });
+
+    $(document).on("click", "#btnWarningDone", function () {
+        $("warningModal").modal("hide");
+        window.location= "/MediApp/Transaction";
+    });
+
+     $(document).on("click","#btnCreateAdmin", function () {
+
+        var user = {};
+        var firstName = $("#FirstNamefld").val(); 
+        var lastName = $("#LastNamefld").val(); 
+        var contact = $("#Contactfld").val(); 
+        var idNumber = $("#IDNumberfld").val(); 
+        var email = $("#Emailfld").val(); 
+
+        var medicalAidNumber = "";
+        var medicalAidPlan = "";
+        var medicalContactNumber = "";
+        var address = $("#Addressfld").val(); 
+        var userType = $("#UserTypeGUIDfld").val();
+
+        if (firstName == "")
+        {
+            message = "First name required";
+            $("#warningMessagelbl").html(message);
+            $("#warningModal").modal("show");
+            return false;
+        }
+
+        if(lastName == "")
+        {
+            message = "Last name required";
+            $("#warningMessagelbl").html(message);
+            $("#warningModal").modal("show");
+            return false;
+        }
+
+        if(contact == "")
+        {
+            message = "Contact number required";
+            $("#warningMessagelbl").html(message);
+            $("#warningModal").modal("show");
+            return false;
+        }
+          
+        if(idNumber == "")
+        {
+            message = "ID number required";
+            $("#warningMessagelbl").html(message);
+            $("#warningModal").modal("show");
+            return false;
+        }
+                     
+        if (email == "")
+        {
+            message = "Email required";
+            $("#warningMessagelbl").html(message);
+            $("#warningModal").modal("show");
+            return false;
+        }
+      
+        if (address == "")
+        {
+            message = "Address required";
+            $("#warningMessagelbl").html(message);
+            $("#warningModal").modal("show");
+            return false;
+        }
+
+        user = {
+            FirstNamefld:firstName,
+            LastNamefld:lastname,
+            Contactfld:contact,
+            IDNumberfld:idNumber,
+            Emailfld:email,
+            UserTypeGUIDfld:userType,
+            MedicalAidNumberfld:medicalAidNumber,
+            MedicalAidPlanfld:medicalAidPlan,
+            MedicalAidContactfld:medicalContactNumber,
+            Addressfld:address
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "https://rest.mediapp.co.za/create-user",
+            dataType: "json",
+            contentType:"application/json; charset=utf-8",
+            data: JSON.stringify(user),
+            success: function (response) {
+                clear();
+                $("#adminModal").modal("hide");
+                $("#successModal").modal("show");
+            },
+            error:function(response) {
+                clear();
+                $("#adminModal").modal("hide");
+                var message = "Oop...Something went wrong, please contact your administrator";
+                $("#errorMessagelbl").html(message);
+                $("#errorModal").modal("show");
+
+            }
+        });
+
+    });
+
+     $(document).on("click", ".btnUploadDocument", function () {
+          var personGuid = $(this).attr("id");
+
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("UploadDocument","MediApp")',
+            data: { personGuid: personGuid },
+            success: function (response) {
+                $(".modal-body").html(response);
+                $('#documentUploadModal').modal("show");
+            }
+        });
+
+     });
+   
+    $(document).on("click", ".btnDocumentView", function () {
+
+        var personGuid = $(this).attr("id");
+
+        $.ajax({
+            type: "GET",
+            url:'@Url.Action("DocumentView","MediApp")',
+            data: { personGuid: personGuid,requestorPage:"AdminPage" },
+            success: function (response) {
+                $(".modal-body").html(response);
+                $('#documentViewModal').modal("show");
+            } ,error:function(response) {
+                $("#error").modal("show");
+            }
+        });
+
+    });
+
+      
+    function clear()
+    {
+        $("#Contactfld").val('');
+        $("#FirstNamefld").val('');
+        $("#LastNamefld").val('');
+        $("#Emailfld").val('');                
+        $("#Addressfld").val('');              
+        $("#IDNumberfld").val('');
+        $("#MedicalAidNumberfld").val('');
+        $("#MedicalAidPlanfld").val('');
+        $("#MedicalAidContactfld").val('');
+        $("#Usernamefld").val('');
+        $("#Passwordfld").val('');
+        $("#ConfirmPasswordfld").val('');
+    }
+
+    $(document).ready(function () {
+        $('#AdminTable').DataTable({
+            "pagingType": 'full',
+            "searching": true,
+            "lengthMenu": [10],
+            ordering: false,
+            "lengthChange": false,
+            "info": false
+        });
+    });
+</script>
+<br />
+<button class="btn btnAddAdmin " data-bs-toggle="modal" data-bs-target="#adminModal"><i class="bx bx-plus"></i>Add Admin</button>
+<br />
+<br />
+<table class="table table-sm table-border-horizontal" id="AdminTable">
+    <thead >
+        <tr >
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>ID</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>Details</th>
+            <th>Documents</th>
+            <th>Add Document</th>
+        </tr>
+    </thead>
+    <tbody >
+        
+        @for (int k = 0; k < Model.AdminList.Count; k++)
+        {
+            <tr>
+                <td><label class="col-form-label">@Model.AdminList[k].FirstNamefld</label> </td>
+                <td><label class="col-form-label">@Model.AdminList[k].LastNamefld</label> </td>
+                <td><label class="col-form-label">@Model.AdminList[k].IDNumberfld</label> </td>
+                <td><label class="col-form-label">@Model.AdminList[k].Contactfld</label> </td>
+                <td><label class="col-form-label">@Model.AdminList[k].Emailfld</label> </td>
+                <td>
+                    <button class="btn btn-sm btn-secondary custom-button" id="@Model.AdminList[k].PersonGUIDfld" 
+                    onclick="window.location = '@Url.Action("UserDetails","MediApp",
+                    new {personGuid = @Model.AdminList[k].PersonGUIDfld })'">
+                        <i class="bx bxs-edit"></i>
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-secondary  custom-button btnDocumentView" id="@Model.AdminList[k].PersonGUIDfld">
+                        <i class="bx bxs-file-doc"></i></button>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-secondary  custom-button btnUploadDocument" id="@Model.AdminList[k].PersonGUIDfld">
+                        <i class="bx bxs-plus-circle"></i></button>
+                </td>
+            </tr>
+        }
+        
+     
+    </tbody>
+</table>
+<br />
+<div id="hiddenAdminTable">
+    @for (int k = 0; k < Model.AdminList.Count; k++)
+    {
+        <div class="card shadow">
+            <div class="card-body">
+                <table class="table table-sm table-border-horizontal">
+                    <tbody>
+                        <tr>
+                            <td width="50%"><label class="col-form-label">First Name</label></td>
+                            <td><label class="col-form-label">@Model.AdminList[k].FirstNamefld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Last Name</label></td>
+                            <td><label class="col-form-label">@Model.AdminList[k].LastNamefld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">ID</label></td>
+                            <td><label class="col-form-label">@Model.AdminList[k].IDNumberfld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Contact</label></td>
+                            <td><label class="col-form-label">@Model.AdminList[k].Contactfld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Email</label></td>
+                            <td><label class="col-form-label">@Model.AdminList[k].Emailfld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Detail</label></td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary custom-button" id="@Model.AdminList[k].PersonGUIDfld" 
+                                onclick="window.location = '@Url.Action("UserDetails","MediApp",new {personGuid = @Model.AdminList[k].PersonGUIDfld })'">
+                                <i class="bx bxs-edit"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Documents</label></td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary  custom-button btnDocumentView" id="@Model.AdminList[k].PersonGUIDfld">
+                                    <i class="bx bxs-file-doc"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Add Document</label></td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary  custom-button btnUploadDocument" id="@Model.AdminList[k].PersonGUIDfld">
+                                    <i class="bx bxs-plus-circle"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+</div>
+<!-- Modal -->
+<div class="modal fade" id="documentViewModal"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="documentViewModalModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentViewModalModalLabel">Attachments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body"> </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="documentUploadModal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="documentModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentModalLabel">Add Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">  </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="adminModal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="adminModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header ">
+                <h5 class="modal-title" id="adminModalLabel">Add Administrator <label class="lblError text-danger"></label></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               
+                    @Html.HiddenFor(m => m.UserTypeGUIDfld)
+
+                    <table class="table table-border-horizontal " width="100%">
+                        <tbody>
+                            <tr>
+                                <td><label class="col-form-label" for="firstName">First Name</label></td>
+                                <td>@Html.TextBoxFor(m => m.FirstNamefld, new { @class = "form-control " }) </td>
+                            </tr>
+                            <tr>
+                                <td><label class="col-form-label" for="lastName">Last Name</label></td>
+                                <td>@Html.TextBoxFor(m => m.LastNamefld, new { @class = "form-control "}) </td>
+                            </tr>
+                            <tr>
+                                <td><label class="col-form-label" for="contact">Contact Number</label></td>
+                                <td>@Html.TextBoxFor(m => m.Contactfld, new { @class = "form-control", maxlength = "10" }) </td>
+                            </tr>
+                            <tr>
+                                <td><label class="col-form-label" for="ID">ID No.</label></td>
+                                <td>@Html.TextBoxFor(m => m.IDNumberfld, new { @class = "form-control ", maxlength = "13", required = true }) </td>
+                            </tr>
+                            <tr>
+                                <td><label class="col-form-label" for="ID">Email</label></td>
+                                <td>@Html.TextBoxFor(m => m.Emailfld, new { @class = "form-control " }) </td>
+                            </tr>
+                            <tr>
+                                <td><label class="col-form-label" for="Address">Address</label></td>
+                                <td>@Html.TextAreaFor(m => m.Addressfld, new { @class = "form-control ", row = "2" }) </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row p-3">
+                        <button class="btn btn-sm btn-secondary ml-2" style="width:120px" id="btnCreateAdmin">Submit</button>
+                    </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="documentModal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="documentModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentModalLabel">Add Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</div>
+
+
+
+ <div class="modal fade" id="successModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="successdModalLabel"          
+      aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successdModalLabel">Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="~/tick2.png" width="200"/></td>
+                                <td>                    
+                                    <h5 id="successLabel">Admin created successfully</h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" style="width:120px" id="btnDone" >Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+          <div class="modal fade" id="errordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="userCreatedModalLabel"          
+      aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userCreatedModalLabel">Error</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="~/error.png" width="200"/></td>
+                                <td>                    
+                                    <h5 id="errorLabel">Oop... something went wrong</h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" style="width:120px" id="btnErrorDone" >Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+        
+    <div class="modal fade" id="warningModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-
+
+        labelledby="warningModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="warningModalLabel">Warning</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                     <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="~/warningIcon.png" width="200" /></td>
+                                <td>                    
+                                    <h5 id="warningMessagelbl"></h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" style="width:120px" id="donebtn" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="documentUploadModal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="documentModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentModalLabel">Add Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">  </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,454 @@
+﻿@model MedicalAppUI.Models.CDisease
+
+<style>
+      .btnTrasanct {
+        background: #198754;
+        color: white;
+    }
+
+    .searchResults-body{
+        height: 400px;
+        overflow-y: auto;
+    }
+
+     table.dataTable.table thead th, table.dataTable.table thead td {
+        position: relative;
+        color: white;
+        background: #214A7A;
+    }
+    .table > :not(:last-child) > :last-child > * {
+        border-bottom: 4px solid red;
+    }
+    .table [class*='bg-'] {
+    color: black;
+    }
+</style>
+<script>
+        
+    $(function () {
+
+         $("#amount").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            var regex = /^[0-9_ ]+$/;
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError").html("Amount field only allows numerical input.");
+            }
+
+            return isValid;
+        });
+
+        $("#searchCode").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            var regex = /^[A-Za-z0-9_ ]+$/;
+
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError").html("Code field only allows numerical and text input.");
+            }
+
+            return isValid;
+        });
+
+         
+        $("#searchDescription").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            var regex = /^[A-Za-z0-9_ ]+$/;
+
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError").html("Search field only allows numerical and text input.");
+            }
+
+            return isValid;
+        });
+
+        
+    });
+
+
+
+
+    $(document).ready(function () {
+        $('#transactionTable').DataTable({
+            "pagingType": 'full',
+            "searching": true,
+            "lengthMenu": [10],
+            ordering: false,
+            "lengthChange": false,
+            "info": false
+        });
+
+       $('#searchResultsTable').DataTable({
+            "pagingType": 'full',
+            "searching": true,
+            "lengthMenu": [5],
+            ordering: false,
+            "lengthChange": false,
+            "info": false
+        });
+
+  
+    });
+
+    $(document).on("click",".btnTrasanct", function ()
+    {
+        $("#addTransactionModal").modal("show");
+    });
+
+    $(document).on("click", "#btnDone", function () {
+        $("#transactionSuccessModal").modal("hide");
+         window.location= "/MediApp/Transaction";
+     });
+
+    $(document).on("click", "#btnErrorDone", function () {
+        $("#errorModal").modal("hide");
+        window.location= "/MediApp/Transaction";
+    });
+
+    $(document).on("click", "#btnWarningDone", function () {
+        $("warningModal").modal("hide");
+        window.location= "/MediApp/Transaction";
+    });
+
+
+    $(document).on("click", "#btnSearchCode", function () {
+
+        var code = $("#searchCode").val();
+
+        if(code == "")
+        {
+            alert("ICD10Code required to continue");
+            return false;
+        }
+
+        $.ajax({
+            type: "GET",
+            url:'/MediApp/GetSearchResultsByCode',
+            data: { code: code },
+            success: function (response) {
+                $(".searchResults-body").html(response);
+                $('#addTransactionModal').modal("hide");
+                $('#searchResultsModal').modal("show");
+            } 
+            ,error:function(response) {
+
+                $("#userErrorCreatedModal").modal("show");
+            }
+        });
+
+    });
+        
+    
+    $(document).on("click", "#btnSearchDescription", function () {
+
+        var description = $("#searchDescription").val();
+        
+        if(description == "")
+        {
+            alert("ICD10Code required to continue");
+            return false;
+        }
+
+        $.ajax({
+            type: "GET",
+            url:'/MediApp/GetSearchResultsByDescription',
+            data: { description: description},
+            success: function (response) {
+                $(".searchResults-body").html(response);
+                $('#addTransactionModal').modal("hide");
+                $('#searchResultsModal').modal("show");
+            } 
+            ,error:function(response) {
+                $("#errorModal").modal("show");
+            }
+        });
+
+    });
+
+     $(document).on("click", ".btnSelect", function () {
+
+         var currentRow=$(this).closest("tr");
+		 var diagnosis = currentRow.find("td:eq(0)").html();
+		 var code = currentRow.find("td:eq(1)").html();
+		 var description = currentRow.find("td:eq(2)").html();
+
+         $("#code").val(code);
+         $("#diagnosisGuid").val(diagnosis);
+         $("#description").val(description);
+         $("#searchDescription").val('');
+         $("#searchCode").val('');
+
+         $("#searchResultsModal").modal("hide");
+         $("#addTransactionModal").modal("show");
+
+    });
+
+
+     $(document).on("click", "#btnSubmitTransaction", function () {
+
+
+         var patientGuid = $(".select-user-list").val();
+		 var diagnosisGuid = $("#diagnosisGuid").val();
+		 var treatmentDescription = $("#prescription").val();
+		 var diagnosisDescription = $("#description").val();
+         var cost = $("#amount").val();
+         var doctorGuid = $("#DoctorGUIDfld").val();
+
+        if(patientGuid == "")
+        {
+            alert("Patient required ");
+            return false;
+        }
+
+         
+        if(diagnosisGuid == "")
+        {
+            alert("Diagnosis required");
+            return false;
+        }
+           
+        if(diagnosisDescription == "")
+        {
+            alert("Diagnosis description required");
+            return false;
+        }
+                     
+        if(treatmentDescription == "")
+        {
+            alert("Prescription description required");
+            return false;
+        }
+
+        if(cost == "")
+        {
+            alert("Cost required");
+            return false;
+        }
+
+         var data = {};
+
+         data = 
+         {
+             PatientGUIDfld:patientGuid,
+             Costfld:cost,
+             DiagnosisDescriptionfld:diagnosisDescription,
+             TreatmentDescriptionfld:treatmentDescription,
+             DoctorGUIDfld:doctorGuid,
+             DiagnosisGUIDfld:diagnosisGuid
+         }
+         console.log(data);
+        $.ajax({
+            type: "POST",                       
+            url: "https://rest.mediapp.co.za/create-transaction",
+            contentType: "application/json;charset=utf-8",
+            data: JSON.stringify(data),
+            dataType: "json",
+            success: function (response) {
+                $('#addTransactionModal').modal("hide");
+                $('#transactionSuccessModal').modal("show");
+            } 
+            ,error:function(response) {
+                $("#errorModal").modal("show");
+            }
+        });
+
+    });
+    
+ </script>
+
+<br />
+@Html.HiddenFor(m =>m.DoctorGUIDfld)
+<button class="btn btn-sm btnTrasanct" >
+    <i class="bx bx-plus"></i>
+    Transact
+</button>
+
+<br />
+<br />
+ <table class="table table-sm table-border-horizontal" id="transactionTable">
+     <thead>
+         <tr>
+             <th>Patient Full Name</th>
+             <th>Diagnosis</th>
+             <th>Amount</th>
+             <th>Date of visit</th>
+             <th>Doctor </th>
+         </tr>
+         
+     </thead>
+     <tbody>
+          @for (int k = 0; k < Model.DiseaseList.Count; k++)
+        {
+            <tr>
+                <td><label class="col-form-label">@Model.DiseaseList[k].PatientFullName</label> </td>
+                <td><label class="col-form-label">@Model.DiseaseList[k].DiagnosisDescriptionfld </label></td>
+                <td><label class="col-form-label">R @Model.DiseaseList[k].Costfld</label></td>
+                <td><label class="col-form-label">@Model.DiseaseList[k].DateCreatedfld </label></td>
+                <td><label class="col-form-label">@Model.DiseaseList[k].DoctorFullName </label></td>
+            </tr>
+        }
+     </tbody>
+
+</table>
+
+    
+<div class="modal fade" id="addTransactionModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addTransactionModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTransactionModalLabel">Transaction <label class="lblError text-danger"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">  
+                <p class="fw-bold">
+                    Search for disease/sickness using a code or disease description e.g."code:A0123 or 
+                    description:cholera"
+                </p>
+                                
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><input class="form-control" type="text" placeholder="Code" id="searchCode" /></td>
+                             <td colspan="2"><button class="btn btn-sm btn-secondary" id="btnSearchCode">Search</button></td>
+
+                        </tr>
+                        <tr>
+                             <td><input class="form-control" type="text" placeholder="Description" id="searchDescription" /></td>
+                            <td colspan="2"><button class="btn btn-sm btn-secondary"id="btnSearchDescription">Search</button></td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <br />
+
+                <table class="table table-sm table-border-horizontal">
+                    <tbody>
+                        <tr>
+                            <td><label class="col-form-label">Patient Full Name</label></td>
+                            <td><select asp-for="PatientGUIDfld" asp-items="@ViewBag.Users"  
+                                class="form-control select-user-list"><option>--Select--</option></select></td>
+                        </tr>
+                         <tr>
+                            <td><label class="col-form-label">Code</label></td>
+                            <td><input class="form-control"  type="text" id="code" readonly/>
+                                <input hidden type="text" id="diagnosisGuid" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Diagnosis Description</label></td>
+                            <td><input class="form-control"  type="text" id="description" readonly/>
+                                <input hidden type="text" id="diagnosisGuid" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Prescription</label></td>
+                            <td>
+                                <textarea class="form-control" rows="3" id="prescription"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Amount</label></td>
+                            <td><input class="form-control" id="amount" /></td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+                
+                    <div class="row p-3">
+                        <button class="btn btn-sm btn-secondary ml-2" style="width:120px" id="btnSubmitTransaction">Submit</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+      <div class="modal fade" id="transactionSuccessModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="transactionSuccessModalLabel"          
+      aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="transactionSuccessModalLabel">Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="~/SuccessImage.png" /></td>
+                                <td>                    
+                                    <h4>Transaction completed successfully</h4>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" style="width:120px" id="donebtn" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+<div class="modal fade" id="searchResultsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="searchResultsModalLabel">
+
+    <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchResultsModalLabel">Search results</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body searchResults-body" >    </div>
+        </div>
+    </div>
+</div>
+
+          <div class="modal fade" id="errordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="userCreatedModalLabel"          
+      aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userCreatedModalLabel">Error</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="~/error.png" width="200"/></td>
+                                <td>                    
+                                    <h5 id="errorLabel">Oop... something went wrong</h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" style="width:120px" id="btnErrorDone" >Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+

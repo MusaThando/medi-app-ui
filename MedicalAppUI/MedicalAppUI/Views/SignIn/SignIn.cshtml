@@ -1,0 +1,582 @@
+﻿
+@{ 
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>SignIn</title>
+
+    <!--Jquery Script-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!--Stylesheet-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="~/Assests/css/style.css">
+    <link rel="stylesheet" type="text/css" href="~/Assests/css/responsive.css">
+
+    <style>
+        body {
+            background-color: rgb(66, 96, 119);
+            background-image: linear-gradient(315deg, rgb(66, 96, 119) 0%, rgb(7, 26, 50) 74%);
+        }
+
+        #hiddensignUpTable { display: none }
+        #hiddenpasswordTable { display: none }
+        #hiddenmedialAidTable { display: none }
+        #signUpTable {display:inline-flex}
+        #medialAidTable{display:inline-grid}
+        #passwordTable{display:inline-grid}
+
+        @@media  only screen and (max-width: 760px),
+        (min-device-width: 768px) and (max-device-width: 1024px) {
+        #signUpTable {display: none}
+        #medialAidTable{display:none}
+        #passwordTable{display:none}
+        #hiddensignUpTable { display: inline-flex;
+    flex-direction: column; }
+        #hiddenpasswordTable { display: inline-flex;
+    flex-direction: column;}
+        #hiddenmedialAidTable { display: inline-flex;
+    flex-direction: column;;}
+        }
+    </style>
+
+  
+    <script>
+        $(function () {
+        $("#IDNumberfld").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            //var regex = /^[A-Za-z0-9_ ]+$/;
+            var regex = /^[0-9_ ]+$/;
+
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError").html("ID Number only allows numerical input.");
+            }
+
+            return isValid;
+        });
+        $("#Contactfld").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            var regex = /^[0-9_ ]+$/;
+
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError").html("Contact field only allows numerical input.");
+            }
+
+            return isValid;
+        });
+
+    });
+
+        $(document).on("click","#btnSignIn", function () {
+            var message = "";
+            var username = $("#txtUsername").val();
+            var password = $("#txtPassword").val();
+
+            if (username == "")
+            {
+                message = "User name required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+
+                return false;
+            }
+
+            if(password == "")
+            {
+                message = "Password required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+
+                return false;
+            }
+          
+            $.ajax({ 
+                 type: "GET",
+                 dataType: "json",
+                 url: "https://rest.mediapp.co.za/validate-user-credentials",
+                 crossDomain:true,
+                 data:{username:username,password:password},
+                 success: function(response){  
+
+                     $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        url: '/SignIn/Authenticate',
+                        data:response,
+                        success:function(response){
+                            window.location = '/MediApp/Home';
+                        }
+                     });
+                    
+                 }
+                 ,error:function(response)
+                 {
+                     var message = "Access denied.Incorrect login details.";
+                     $("#errorMessagelbl").html(message);
+                     $("#errorModal").modal("show");
+
+                 }
+            });
+        });
+
+        $(document).on("click","#btnSubmitRegistration", function () {
+
+                var contact = $("#Contactfld").val();
+                var firstName= $("#FirstNamefld").val();
+                var lastName = $("#LastNamefld").val();
+                var email = $("#Emailfld").val();                
+                var address = $("#Addressfld").val();              
+                var idNumber = $("#IDNumberfld").val();
+                var medicalAidNumber = $("#MedicalAidNumberfld").val();
+                var medicalPlan = $("#MedicalAidPlanfld").val();
+                var medicalContact = $("#MedicalAidContactfld").val();
+                var username = $("#Usernamefld").val();
+                var password = $("#Passwordfld").val();
+                var confirmPassword = $("#ConfirmPasswordfld").val();
+                var userTypeGuid = "7BE8F6AD-8B8F-411D-9FE3-1DFD94207034";
+                var practiceGuid = null;
+                var primaryDoctorGuid = null;
+                var message ="";
+
+                            
+            if (firstName == "")
+            {
+                message = "First name required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+            if(lastName == "")
+            {
+                message = "Last name required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+            if(contact == "")
+            {
+                message = "Contact number required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+                        
+            if (address == "")
+            {
+                message = "Address required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }            
+                     
+            if (email == "")
+            {
+                message = "Email required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+            
+
+
+            if(idNumber == "")
+            {
+                message = "ID number required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+            if(medicalAidNumber != "" &&  (medicalPlan == "" || medicalContact == ""))
+            {
+                message = "Please fill in the rest of the medical aid information";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+                
+            if(medicalPlan != "" &&  (medicalAidNumber == "" || medicalContact == ""))
+            {
+                message = "Please fill in the rest of the medical aid information";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+
+            }
+             
+            if(medicalContact != "" &&  (medicalPlan == "" || medicalAidNumber == ""))
+            {
+                message = "Please fill in the rest of the medical aid information";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+                   
+            if (username == "")
+            {
+                message = "User name required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+            if(password == "")
+            {
+                message = "Password required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+            var data = {};
+
+            data = 
+            {
+                FirstNamefld:firstName,
+                LastNamefld:lastName,
+                Emailfld:email,
+                Contactfld:contact,
+                Addressfld:address,
+                IDNumberfld:idNumber,
+                MedicalAidNumberfld:medicalAidNumber,
+                MedicalAidPlanfld:medicalPlan,
+                MedicalAidContactfld:medicalContact,
+                Passwordfld:password,
+                ConfirmPasswordfld:confirmPassword,
+                Usernamefld:username,
+                UserTypeGUIDfld:userTypeGuid
+            }
+
+
+            //register new user
+            $.ajax({
+                    type: "POST",
+                    url: "https://rest.mediapp.co.za/register-user",
+                    contentType: "application/json;charset=utf-8",
+                    crossDomain:true,
+                    data: JSON.stringify(data),
+                    success: function(response)
+                    {
+                        clear();
+                        $("#signUpModal").modal("hide");
+                        $("#successModal").modal("show");
+
+                    }
+                    ,error:function(response)
+                    {
+                        $("#errorMessagelbl").html("Oop... Something went wrong, please contact your administrator")
+                        $("#errorModal").modal("show");
+                    }
+            });
+            
+        });
+
+        function clear()
+        {
+             $("#Contactfld").val('');
+             $("#FirstNamefld").val('');
+             $("#LastNamefld").val('');
+             $("#Emailfld").val('');                
+             $("#Addressfld").val('');              
+             $("#IDNumberfld").val('');
+             $("#MedicalAidNumberfld").val('');
+             $("#MedicalAidPlanfld").val('');
+             $("#MedicalAidContactfld").val('');
+             $("#Usernamefld").val('');
+             $("#Passwordfld").val('');
+             $("#ConfirmPasswordfld").val('');
+        }
+
+    </script>
+</head>
+<body >
+    <section class="vh-100">
+  <div class="container-fluid h-custom">
+     
+    <div class="row d-flex justify-content-center align-items-center vh-100">
+                 <h1 class="text-center text-white pt-2">Your bestfriend in Health</h1>
+      <div class="col-md-9 col-lg-6 col-xl-5">
+        <img src="~/medicine-transparent-25.png" class="img-fluid"
+          alt="Sample image">
+      </div>
+      <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+        <form>
+          <p id"="passwordIncorrect" class="text-danger"></p>
+          <div class="d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
+            <p class="lead fw-normal mb-0 me-3 pb-3 text-white">Please login to your account</p>
+          </div>
+
+          <!-- Email input -->
+          <div class="form-outline mb-4">
+            <input type="text" id="txtUsername" class="form-control form-control-lg"
+              placeholder="Enter username" />
+            <label class="form-label text-white" for="form3Example3">Username</label>
+          </div>
+
+          <!-- Password input -->
+          <div class="form-outline mb-3">
+            <input type="password" id="txtPassword" class="form-control form-control-lg bg-white"
+              placeholder="Enter password" />
+            <label class="form-label text-white" for="form3Example4">Password</label>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <!-- Checkbox -->
+            <div class="form-check mb-0">
+              <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3" />
+              <label class="form-check-label text-white" for="form2Example3">
+                Remember me
+              </label>
+            </div>
+            <a href="#!" class="text-white" data-bs-toggle="modal" data-bs-target="#recoverPasswordModal">Forgot password?</a>
+          </div>
+
+          <div class="text-center text-lg-start mt-4 pt-2">
+            <button type="button" id="btnRegister" class="btn btn-lg"
+              style="padding-left: 2.5rem; padding-right: 2.5rem;color:white; background-color:#198754">Sign In</button>
+            <p class="small fw-bold mt-2 pt-1 mb-0 text-white">Don't have an account? <a href="#!"
+                class="link-danger" data-bs-toggle="modal" data-bs-target="#signUpModal" >Register</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+    <div class="modal fade" id="recoverPasswordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" 
+    aria-labelledby="recoverPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="recoverPasswordModalLabel">Forgot Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="email">Email Address</label>
+                    <input class="form-control" type="email" name="email" placeholder="xyz@gmail.com" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Sign Up Modal-->
+    <div class="modal fade" id="signUpModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" 
+    aria-labelledby="signUpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signUpModalLabel">Create Account <label class="lblError text-danger"></label>  </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body ">
+
+                     <label class="fw-bold fs-5 pt-3 pb-3 text-black-50">Personal information</label>
+                       
+                     <div class="mb-3">
+                        <label class="col-form-label text-black" for="firstName">First Name</label>                            
+                        <input asp-for="FirstNamefld" type="text" class="form-control" name="firstName"  />                       
+                     </div>
+                           
+                     <div class="mb-3">
+                        <label class="col-form-label" for="lastName">Last Name</label>                       
+                        <input asp-for="LastNamefld" type="text" class="form-control" name="lastName"  />                    
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="col-form-label" for="contact">Contact Number</label>                       
+                        <input asp-for="Contactfld" type="text" class="form-control" name="contact"  maxlength="10" />                    
+                    </div>
+
+                                        
+                    <div class="mb-3">
+                        <label class="col-form-label" for="address">Address</label>                       
+                        <textarea asp-for="Addressfld" type="text" class="form-control" name="address"  rows="3"></textarea>                    
+                    </div>
+
+                                                            
+                    <div class="mb-3">
+                        <label class="col-form-label" for="email">Email</label>                       
+                        <input asp-for="Emailfld" type="email" class="form-control" name="email"  />                  
+                    </div>
+
+
+                                                            
+                    <div class="mb-3">
+                        <label class="col-form-label" for="address">ID No.</label>                       
+                       <input asp-for="IDNumberfld" type="text" class="form-control" name="ID" maxlength="13" />                   
+                    </div>
+
+
+                    
+                    
+                    
+
+
+
+
+                    <br />
+
+                    <label class="fw-bold fs-5 pt-3 pb-3 text-black-50">Medical Aid Information</label>
+                                        
+                    
+                    <div class="mb-3">
+                       <label class="col-form-label" for="medicalAid">Medical Aid No.</label>                       
+                        <input asp-for="MedicalAidPlanfld" type="text" class="form-control" name="medicalPlan"  />                    
+                    </div>
+                                                            
+                    <div class="mb-3">
+                        <label class="col-form-label" for="MedicalAidContacts">Medical Contacts</label>                     
+                        <input asp-for="MedicalAidNumberfld" type="text" class="form-control" name="medicalAid"  />                 
+                    </div>
+                                                            
+                    <div class="mb-3">
+                        <label class="col-form-label" for="medicalPlan">Medical Aid Plan</label>                       
+                       <input asp-for="MedicalAidContactfld" type="text" class="form-control" name="MedicalAidContacts"   />            
+                    </div>
+
+
+
+
+
+                      
+                    <br />
+                
+
+                    <label class="fw-bold fs-5 pt-3 pb-3 text-black-50">Sign In Credentials</label>
+                    <div class="mb-3">
+                        <label class="col-form-label" for="username">Username:</label>
+                        <input asp-for="Usernamefld" type="text" class="form-control" name="username"  />
+                    </div>
+                    <div class="mb-3">
+                        <label class="col-form-label" for="password">Password</label>
+                        <input asp-for="Passwordfld" type="password" class="form-control" name="password" />
+                    </div>
+                    <div class="mb-3">
+                       <label class="col-form-label" for="confirmPassword">Confirm Password</label>
+                        <input asp-for="ConfirmPasswordfld" type="password" class="form-control" name="confirmPassword"  />
+                    </div>
+                        
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnSubmitRegistration">Submit</button>
+                </div>
+             
+                </div>
+           
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="successModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-
+
+labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                     <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="~/tick2.png" width="200" /></td>
+                                <td>                    
+                                    <h5>Registered successfully</h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" style="width:120px" id="donebtn" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+         
+    <div class="modal fade" id="errorModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-
+
+        labelledby="usernameRequiredModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="usernameRequiredModalLabel">Error </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="~/error.png" width="200" /></td>
+                                <td>                    
+                                    <h5 id="errorMessagelbl"></h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>                
+                    </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" style="width:120px" id="donebtn" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="warningModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-
+
+        labelledby="warningModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="warningModalLabel">Warning</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                     <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="~/warningIcon.png" width="200" /></td>
+                                <td>                    
+                                    <h5 id="warningMessagelbl"></h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" style="width:120px" id="donebtn" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</body>
+</html>

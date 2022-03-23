@@ -1,0 +1,24 @@
+﻿@model MedicalAppUI.Models.CDocumentRepository
+    <table class="table table-border-horizontal" width="100%">
+        <thead>
+            <tr>
+                <th>File Name</th>
+                <th>Download</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int k = 0; k < Model.DocumentList.Count; k++)
+            {
+                <tr>
+                    <td>@Model.DocumentList[k].FileNamefld</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" 
+                        onclick="window.location = '@Url.Action("DownloadDocument","MediApp",
+                        new {documentRepository = @Model.DocumentList[k].DocumentRepositoryGUIDfld  })'">
+                        <i class="bx bxs-cloud-download"></i></button>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>

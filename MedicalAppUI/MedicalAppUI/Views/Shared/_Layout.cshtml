@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+
+    <link runat="server" rel="shortcut icon" href="~/Meical.ico" type="image/x-icon" />
+    <link runat="server" rel="icon" href="~/Meical.ico" type="image/ico" />
+
+    <!--Jquery Script-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!--Stylesheet-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="~/Assests/css/style.css">
+    <link rel="stylesheet" type="text/css" href="~/Assests/css/responsive.css">
+
+    <!--Icons-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" />
+
+    <script src="https://code.iconify.design/2/2.0.3/iconify.min.js"></script>
+
+    <!-- Google font-->
+    <link href="https://fonts.googleapis.com/css?family=Rubik:400,400i,500,500i,700,700i&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="~/Assests/css/fontawesome.css">
+
+    <!--Datatables-->
+    <link rel="stylesheet" type="text/css" href="~/Assests/css/vendors/datatables.css" />
+
+    <style>
+
+        .modal-header{
+            border-bottom:4px solid red; 
+        }
+  
+        .nav-link {
+            display: block;
+            padding: .5rem 1rem;
+            color: black;
+            text-decoration: none;
+            transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out;
+        }
+
+            .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .logo-wrapper, .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .logo-icon-wrapper {
+            padding: 27px 30px;
+            border-bottom: 4px solid #d9534f;
+            -webkit-box-shadow: -9px 0 20px rgb(89 102 122 / 10%);
+            box-shadow: -9px 0 20px rgb(89 102 122 / 10%);
+            }
+
+        .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+            max-width: 1487px;
+        }
+
+        .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .logo-wrapper, .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .logo-icon-wrapper {
+            padding: 27px 30px;
+            border-bottom: 4px solid red;
+            -webkit-box-shadow: -9px 0 20px rgb(89 102 122 / 10%);
+            box-shadow: -9px 0 20px rgb(89 102 122 / 10%);
+            background: White;
+        }
+
+
+        .page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper {
+            position: fixed;
+            top: 0;
+            z-index: 9;
+            height: auto;
+            line-height: inherit;
+            background: #214A7A;
+            width: 280px;
+            text-align: left;
+            -webkit-transition: 0.3s;
+            transition: 0.3s;
+            -webkit-box-shadow: 0 0 21px 0 rgb(89 102 122 / 10%);
+            box-shadow: 0 0 21px 0 rgb(89 102 122 / 10%);
+        }
+        svg {
+            vertical-align: middle;
+        }
+        .sign-out {
+            cursor:pointer;
+        }
+
+
+        .navbar-nav {
+            -webkit-box-align: start;
+            -ms-flex-align: start;
+            align-items: start;
+        }
+        .bx-atom:before {
+            content: "\ec21";
+            font-size: 20px;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper compact-wrapper" id="pageWrapper">
+        <!-- Page Header Start-->
+        <div class="page-header">
+            <div class="header-wrapper row m-0">
+                <div class="header-logo-wrapper col-auto p-0">
+                    <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i></div>
+                </div>
+                <div class="left-header col horizontal-wrapper ps-0">
+                    <ul class="horizontal-menu">
+                    </ul>
+                </div>
+                <div class="nav-right col-8 pull-right right-header p-0">
+                    <ul class="nav-menus">
+                        <li class="profile-nav onhover-dropdown p-0 me-0">
+                            <div class="media profile-media">
+                                <div class="media-body">
+                                    <span>@ViewBag.FullName</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Page Header Ends-->
+        <!-- Page Body Start-->
+        <div class="page-body-wrapper">
+            <!-- Page Sidebar Start-->
+            <div class="sidebar-wrapper vh-100">
+                <div>
+                    <div class="logo-wrapper">
+                        <h3 class="text-center text-black-50"> <a asp-action="Index" asp-controller="Home">Medi App</a>
+                    </h3>
+                    </div>
+                    <nav class="sidebar-main bg-transparent">
+                        <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
+                        <div id="sidebar-menu bg-transparent">
+                            <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
+                            <div id="sidebar-menu  bg-transparent">
+                                <ul class="navbar-nav ">
+                                    @if (ViewBag.UserType == "User")
+                                    {
+                                        <li class="nav-item"><a asp-action="Home" asp-controller="MediApp" class="nav-link text-white">
+                                            <i class='bx bxs-file-doc nav_icon'></i><span class="p-3">Home</span></a>
+                                        </li>
+                                        <li class="nav-item"><a asp-action="Profile" asp-controller="MediApp" class=" nav-link text-white">
+                                            <i class="iconify" data-icon="icomoon-free:profile"></i><span class="p-3">Profile</span></a>
+                                        </li>
+                                        <li class="nav-item"><a asp-action="Documents" asp-controller="MediApp" class="nav-link text-white">
+                                            <i class='bx bxs-file-doc nav_icon'></i><span class="p-3">Documentation</span></a>
+                                        </li>
+                                    }
+                                    else if (ViewBag.UserType == "Doctor")
+                                    {
+                                        <li class="nav-item"><a asp-action="Home" asp-controller="MediApp"  class="nav-link text-white">
+                                            <i class='bx bxs-file-doc nav_icon'></i><span class="p-3">Home</span></a>
+                                        </li>
+                                        <li class="nav-item"><a asp-action="Profiles" asp-controller="MediApp" class=" nav-link text-white">
+                                            <i class="iconify" data-icon="icomoon-free:profile"></i><span class="p-3">Profile</span></a>
+                                        </li>
+                                        <li class="nav-item"><a asp-action="Users" asp-controller="MediApp" class=" nav-link text-white">
+                                            <i class='bx bx-user nav_icon'></i><span class="p-3">Users</span></a>
+                                        </li>
+                                        <li class="nav-item"><a asp-action="Documents" asp-controller="MediApp" class="nav-link text-white">
+                                            <i class='bx bxs-file-doc nav_icon'></i><span class="p-3">Documentation</span></a>
+                                        </li>
+                                    }
+                                    else
+                                    {
+                                        <li class="nav-item"><a asp-action="Home" asp-controller="MediApp"  class="nav-link text-white">
+                                            <i class='bx bxs-file-doc nav_icon'></i><span class="p-3">Home</span></a>
+                                         </li>
+                                        <li class="nav-item"><a asp-action="Profile" asp-controller="MediApp" class=" nav-link text-white">
+                                            <i class="iconify" data-icon="icomoon-free:profile"></i><span class="p-3">Profile</span></a>
+                                        </li>
+                                        <li class="nav-item"><a asp-action="Users" asp-controller="MediApp" class=" nav-link text-white">
+                                            <i class='bx bx-user nav_icon'></i><span class="p-3">Users</span></a>
+                                        </li>
+                                        <li class="nav-item"><a asp-action="Doctors" asp-controller="MediApp" class="nav-link text-white">
+                                            <i class="iconify " data-icon="vaadin:doctor"></i><span class="p-3">Doctors</span></a>
+                                        </li>
+                                        <li class="nav-item"><a asp-action="Documents" asp-controller="MediApp" class="nav-link text-white">
+                                            <i class='bx bxs-file-doc nav_icon'></i><span class="p-3">Documentation</span></a>
+                                        </li>
+                                              <li class="nav-item"><a asp-action="Transaction" asp-controller="MediApp" class="nav-link text-white">
+                                            <i class='bx bxs-file-doc nav_icon'></i><span class="p-3">Transaction</span></a>
+                                        </li>
+                                        <li class="nav-item"><a asp-action="Administration" asp-controller="MediApp" class="nav-link text-white">     
+                                            <i class="iconify" data-icon="clarity:administrator-solid">
+
+                                        </i><span class="p-3">Administration</span></a>
+                                            
+                                    </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                    <div class="position-absolute container ml-auto bg-transparent text-center" style="bottom:0;left:auto">
+                        <a class="nav-link pl-3 pb-2" style="color:white" asp-action="SignOut" asp-controller="SignIn">
+                            <i class="iconify" data-icon="icomoon-free:exit" data-width="20" data-height="20"> </i>
+                            <label class="p-2 text-white sign-out">Sign Out</label>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Page Sidebar Ends-->
+            <div class="page-body ">
+
+                <!-- Container-fluid starts-->
+                <div class="container">
+                    <br />
+                    <h3 class="text-black-50 ml-2">@ViewBag.Heading</h3>
+                    @RenderBody()
+                </div>
+                <!-- Container-fluid Ends-->
+            </div>
+            <!-- footer start-->
+        </div>
+    </div>
+    <!-- latest jquery-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>    <!-- Bootstrap js-->
+    <!-- feather icon js-->
+    <script src="~/Assests/js/icons/feather-icon/feather.min.js"></script>
+    <script src="~/Assests/js/icons/feather-icon/feather-icon.js"></script>
+
+    <!-- Sidebar jquery-->
+    <script src="~/Assests/js/config.js"></script>
+
+    <!-- Plugins JS start-->
+    <script src="~/Assests/js/sidebar-menu.js"></script>
+
+       
+</body>
+</html>

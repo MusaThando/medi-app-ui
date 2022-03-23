@@ -1,0 +1,302 @@
+﻿@model MedicalAppUI.Models.CViewModel
+<style>
+    .btnUpdateProfile {
+        width: 200px;
+        background: #198754;
+        color:white;
+    }
+
+    .tableHeader {
+        background: #0D3562;
+        color: white;
+        border-bottom: 4px solid red;
+        padding: 5px;
+    }
+</style>
+
+  
+<script>
+        
+    $(function () {
+        $("#Contactfld").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError_personalInfo").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            var regex = /^[0-9_ ]+$/;
+
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError_personalInfo").html("Contact field only allows numerical input.");
+            }
+
+            return isValid;
+        });
+        $("#NextOfKinContactfld").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError_nok").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            var regex = /^[0-9_ ]+$/;
+
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError_nok").html("Next of kin Contact field only allows numerical input.");
+            }
+
+            return isValid;
+        });
+
+         
+        $("#MedicalAidContactfld").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError_medicalAid").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            var regex = /^[0-9_ ]+$/;
+
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError_medicalAid").html("Medical Aid Contact field only allows numerical input.");
+            }
+
+            return isValid;
+        });
+
+    });
+
+
+    $(document).on('click', "#donebtn", function ()
+    {
+        $("#registerModal").modal("hide");
+        window.location = "https://rest.mediapp.co.za/MediApp/Profile";
+    })
+
+    $(document).on('click',".btnUpdateProfile", function () {
+
+        var obj = {};
+
+        var contact = $("#Contactfld").val();
+        var address = $("#Addressfld").val();
+        var medicalAidNumber = $("#MedicalAidNumberfld").val();
+
+        var nokContact = $("#NextOfKinContactfld").val();
+        var nokFirstName = $("#NextOfKinFirstNamefld").val();
+        var nokLastName = $("#NextOfKinLastNamefld").val();
+
+        var medicalAidPlan = $("#MedicalAidPlanfld").val();
+        var email = $("#Emailfld").val();
+        var medicalAidContact = $("#MedicalAidContactfld").val();
+        var personGuid = $("#PersonGUIDfld").val();
+        var userName = $("#Usernamefld").val();
+        var password = $("#Passwordfld").val();
+        var confirmPassword = $("#ConfirmPasswordfld").val();
+        var passwordCheck = $("#PasswordCheck").val();
+
+        if(nokLastName != "" && nokFirstName == "")
+        {
+             alert("Please fill in the next of kin's first name");
+            return;
+        }
+
+        if(nokContact != "" && nokFirstName == "" && nokLastName == "")
+        {
+             alert("Please fill in the next of kin's first name and last name");
+            return;
+        }
+
+        if (password != confirmPassword)
+        {
+            alert("Password confirmation does not match the password.");
+            return;
+        }
+
+        obj =
+        {
+            Contactfld: contact,
+            PersonGUIDfld: personGuid,
+            Addressfld: address,
+            Usernamefld: userName,
+            Emailfld: email,
+            Passwordfld: password,
+            NextOfKinContactfld: nokContact,
+            NextOfKinFirstNamefld: nokFirstName,
+            NextOfKinLastNamefld: nokLastName,
+            ConfirmPasswordfld: confirmPassword,
+            MedicalAidNumberfld: medicalAidNumber,
+            MedicalAidPlanfld: medicalAidPlan,
+            MedicalAidContactfld: medicalAidContact,
+            PasswordCheck: passwordCheck
+        }
+      
+        $.ajax({
+            type: "POST"
+            ,url: 'https://api.mediapp.co.za/update-profile'
+            ,contentType: "application/json"
+            ,data:JSON.stringify(obj)
+            ,dataType:'json'
+            ,success: function (response) {
+                $("#profileUpdatedModal").modal("show");
+            }
+            ,error: function() {
+                $("#profileErrorModal").modal("show");
+            }
+        });
+
+     });
+</script>
+
+<br />
+<div class="container">
+    @Html.HiddenFor(m => m.PasswordCheck)
+    @Html.HiddenFor(m => m.PersonGUIDfld)
+  <section>
+        <div class="jumbotron-fluid tableHeader">
+            <label class="text-uppercase col-form-label" style="font-size: medium">Personal Information</label>
+        </div>
+        <label class="lblError_personalInfo text-danger"></label>
+        <table class="table table-border-horizontal shadow ">
+            <tbody class="bg-white">
+                <tr>
+                    <td width="30%"><label class="col-form-label" for="firstName">First Name</label></td>
+                    <td><input asp-for="FirstNamefld" type="text" class="form-control " readonly />  </td>
+                </tr>
+                <tr>
+                    <td><label class="col-form-label" for="lastName">Last Name</label></td>
+                    <td><input asp-for="LastNamefld" type="text" class="form-control " readonly />  </td>
+                </tr>
+                <tr>
+                    <td><label class="col-form-label" for="contact">Contact Number</label></td>
+                    <td><input asp-for="Contactfld" maxlength="10" class="form-control " />  </td>
+                </tr>
+                <tr>
+                    <td><label class="col-form-label" for="address">Address</label></td>
+                    <td><textarea asp-for="Addressfld"  rows="3" class="form-control"></textarea>  </td>
+                </tr>
+                <tr>
+                    <td><label class="col-form-label" for="address">Email</label></td>
+                    <td><input asp-for="Emailfld" type="email" class="form-control"  />  </td>
+                </tr>
+                <tr>
+                    <td><label class="col-form-label" for="ID">ID No.</label></td>
+                    <td><input asp-for="IDNumberfld" maxlength="13" class="form-control " readonly />  </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </section>
+    <br />
+    <section>
+
+        <div class="jumbotron-fluid  tableHeader ">
+            <label class="text-uppercase col-form-label" style="font-size:medium">Next Of Kin Information</label>
+        </div>
+        <label class="lblError_nok text-danger"></label>
+        <table class="table table-border-horizontal  shadow ">
+            <tbody class="bg-white">
+                <tr>
+                    <td width="30%"><label class="col-form-label" for="NextOfKinFirstNamefld">First Name</label></td>
+                    <td><input asp-for="NextOfKinFirstNamefld" type="text" class="form-control "  />  </td>
+                </tr>
+                <tr>
+                    <td><label class="col-form-label" for="NextOfKinLastNamefld">Last Name</label></td>
+                    <td><input asp-for="NextOfKinLastNamefld" type="text" class="form-control "  />  </td>
+                </tr>
+                <tr>
+                    <td><label class="col-form-label" for="NextOfKinContactfld">Contact</label></td>
+                    <td><input asp-for="NextOfKinContactfld" type="text" maxlength="10" class="form-control "  />  </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <br />
+    <section >
+        <div class="jumbotron-fluid  tableHeader ">
+            <label class="text-uppercase col-form-label" style="font-size:medium">Medical Aid Information</label>
+        </div>
+         <label class="lblError_medicalAid text-danger"></label>
+        <table class="table table-border-horizontal  shadow ">
+            <tbody class="bg-white">
+                <tr>
+                    <td width="30%"><label class="col-form-label" for="medicalAid">Medical Aid No.</label></td>
+                    <td><input asp-for="MedicalAidNumberfld" type="text" class="form-control " />  </td>
+                </tr>
+                <tr>
+                    <td><label class="col-form-label" for="medicalPlan">Medical Aid Plan</label></td>
+                    <td><input asp-for="MedicalAidPlanfld" type="text" class="form-control " />  </td>
+                </tr>
+                <tr>
+                    <td><label class="col-form-label" for="email">Medical Aid Contact</label></td>
+                    <td><input asp-for="MedicalAidContactfld" type="text" maxlength="10" class="form-control " />  </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <br />
+    <section>
+        <div class="jumbotron-fluid tableHeader pl-1">
+            <label class="text-uppercase col-form-label" style="font-size: medium">Login Information</label>
+        </div>
+        <table class="table table-border-horizontal shadow ">
+            <tbody class="bg-white">
+                <tr>
+                    <td width="30%"><label class="col-form-label" for="username">Username:</label></td>
+                    <td><input asp-for="Usernamefld" type="text" class="form-control " required/>  </td>
+                </tr>
+                <tr>
+                    <td><label class="col-form-label" for="password">Password</label></td>
+                    <td> @Html.TextBoxFor(m => m.Passwordfld, new { @class = "form-control", type = "password" })  </td>
+                </tr>
+                <tr>
+                    <td><label class="col-form-label" for="confirmPassword">Confirm Password</label></td>
+                    <td> @Html.TextBoxFor(m => m.ConfirmPasswordfld, new { @class = "form-control", type = "password" })  </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <div class="row p-3 text-center">
+        <button class="btn  p-1 text-center btnUpdateProfile bg-secondary" >Update Information</button>
+    </div>
+</div>
+  
+
+<div class="modal fade" id="profileUpdatedModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="profileUpdatedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileUpdatedModalLabel">Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label>Profile Updated</label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm btn-secondary" style="width:120px"  id="donebtn">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="profileErrorModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="profileErrorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileErrorModalLabel">Error</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label>Something went wrong. Please contact your administrator</label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm btn-secondary" style="width:120px"  id="donebtn">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+

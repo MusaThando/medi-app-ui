@@ -1,0 +1,625 @@
+﻿@model MedicalAppUI.Models.CViewModel
+
+<script>
+        
+    $(function () {
+
+         $("#Contactfld").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            var regex = /^[0-9_ ]+$/;
+
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError").html("Contact field only allows numerical input.");
+            }
+
+            return isValid;
+        });
+        $("#IDNumberfld").keypress(function (e) {
+            var keyCode = e.keyCode || e.which;
+
+            $(".lblError").html("");
+
+            //Regex for Valid Characters i.e. Alphabets and Numbers.
+            var regex = /^[0-9_ ]+$/;
+
+            //Validate TextBox value against the Regex.
+            var isValid = regex.test(String.fromCharCode(keyCode));
+            if (!isValid) {
+                $(".lblError").html("ID Number field only allows numerical input.");
+            }
+
+            return isValid;
+        });
+
+        
+    });
+
+     $(document).on("click", "#btnDone", function () {
+        $("#transactionSuccessModal").modal("hide");
+         window.location= "/MediApp/Transaction";
+     });
+
+    $(document).on("click", "#btnErrorDone", function () {
+        $("#errorModal").modal("hide");
+        window.location= "/MediApp/Transaction";
+    });
+
+    $(document).on("click", "#btnWarningDone", function () {
+        $("warningModal").modal("hide");
+        window.location= "/MediApp/Transaction";
+    });
+    $(document).ready(function () {
+        $('#DoctorTable').DataTable({
+            "pagingType": 'full',
+            "searching": true,
+            "lengthMenu": [10],
+            ordering: false,
+            "lengthChange": false,
+            "info": false
+        });
+
+    });
+
+      $(document).on("click", ".btnUploadDocument", function () {
+
+        var personGuid = $(this).attr("id");
+
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("UploadDocument","MediApp")',
+            data: { personGuid: personGuid },
+            success: function (response) {
+                $(".modal-body").html(response);
+                $('#documentUploadModal').modal("show");
+            }
+        });
+
+    });
+
+    $(document).on("click", ".btnDocumentView", function () {
+
+        var personGuid = $(this).attr("id");
+
+        $.ajax({
+            type: "GET",
+            url:'@Url.Action("DocumentView","MediApp")',
+            data: { personGuid: personGuid,requestorPage:"DoctorPage" },
+            success: function (response) {
+                $(".modal-body").html(response);
+                $('#documentViewModal').modal("show");
+            } ,error:function(response) {
+                $("#errorModal").modal("show");
+            }
+        });
+
+    });
+
+     
+    $(document).on("click", "#btnDone", function () {
+      
+        $("#doctorCreatedModal").modal("hide");
+         window.location= "/MediApp/Doctors";
+
+    });
+       
+    $(document).on("click", "#btnCreateDoctor", function () {
+                        
+            var contact = $("#Contactfld").val();
+            var firstName= $("#FirstNamefld").val();
+            var lastName = $("#LastNamefld").val();
+            var email = $("#Emailfld").val();                
+            var idNumber = $("#IDNumberfld").val();
+            var practiceRegistration = $("#PracticeRegistration").val();
+            var practiceName = $("#PracticeNamefld").val();
+            var address = $("#Addressfld").val();
+            var practiceAddress = $("#PracticeAddressfld").val();
+            var userTypeGuid = $("#UserTypeGUIDfld").val();
+
+            if (firstName == "")
+            {
+                message = "First name required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+            if(lastName == "")
+            {
+                message = "Last name required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+            if(contact == "")
+            {
+                message = "Contact number required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+          
+            if(idNumber == "")
+            {
+                message = "ID number required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+                     
+            if (email == "")
+            {
+                message = "Email required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+      
+            if (address == "")
+            {
+                message = "Address required";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+                        
+            if(practiceRegistration != "" &&  (practiceName == "" || practiceAddress == ""))
+            {
+                message = "Please fill in the rest of the practice information";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+
+            }
+
+                     
+            if(practiceName != "" &&  (practiceRegistration == "" || practiceAddress == ""))
+            {
+                message = "Please fill in the rest of the practice information";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+            if(practiceAddress != "" &&  (practiceRegistration == "" || practiceName == ""))
+            {
+                message = "Please fill in the rest of the practice information";
+                $("#warningMessagelbl").html(message);
+                $("#warningModal").modal("show");
+                return false;
+            }
+
+            var data = {};
+
+            data = 
+            {
+                FirstNamefld:firstName,
+                LastNamefld:lastName,
+                Emailfld:email,
+                Contactfld:contact,
+                Addressfld:address,
+                IDNumberfld:idNumber,
+                PracticeRegistration:practiceRegistration,
+                PracticeNamefld:practiceName,
+                PracticeAddressfld:practiceAddress,
+                UserTypeGUIDfld:userTypeGuid
+            }
+
+
+            //create new user
+            $.ajax({
+                    type: "POST",
+                    url: "https://rest.mediapp.co.za/create-doctor",
+                    contentType: "application/json;charset=utf-8",
+                    data: JSON.stringify(data),
+                    success: function(response)
+                    {
+                        clear();
+                        $("#doctorModal").modal("hide");
+                        $("#successModal").modal("show");
+                    }
+                    ,error:function(response)
+                    {
+                        $("#errorModal").modal("show");
+                    }
+            });
+
+    
+    });
+
+      
+    function clear()
+    {
+            $("#Contactfld").val('');
+            $("#FirstNamefld").val('');
+            $("#LastNamefld").val('');
+            $("#Emailfld").val('');                
+            $("#Addressfld").val('');              
+            $("#IDNumberfld").val('');
+            $("#MedicalAidNumberfld").val('');
+            $("#MedicalAidPlanfld").val('');
+            $("#MedicalAidContactfld").val('');
+            $("#Usernamefld").val('');
+            $("#Passwordfld").val('');
+            $("#ConfirmPasswordfld").val('');
+    }
+</script>
+<style>
+    .btnAddDoctor {
+        background: #198754;
+        color: white;
+    }
+
+    #hiddenDoctorTable {
+        display: none;
+    }
+    table.dataTable.table thead th, table.dataTable.table thead td {
+        position: relative;
+        color: white;
+        background: #214A7A;
+    }
+    #DoctorTable {
+        border-bottom: 4px solid red;
+    }
+    @@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+        #DoctorTable, #DoctorTable_wrapper {
+            display: none;
+        }
+
+        #hiddenDoctorTable {
+            display: block;
+        }
+    }
+</style>
+
+<br />
+<button class="btn btnAddDoctor" data-bs-toggle="modal" data-bs-target="#doctorModal"><i class="bx bx-plus"></i>Add Doctor </button>
+<br />
+<br />
+
+<table class="table table-sm table-border-horizontal" id="DoctorTable">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>ID</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>Details</th>
+            <th>Documents</th>
+            <th>Add Document</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int k = 0; k < Model.DoctorList.Count; k++)
+        {
+            <tr>
+                <td>@Model.DoctorList[k].FirstNamefld</td>
+                <td>@Model.DoctorList[k].LastNamefld</td>
+                <td>@Model.DoctorList[k].IDNumberfld</td>
+                <td>@Model.DoctorList[k].Contactfld</td>
+                <td>@Model.DoctorList[k].Emailfld</td>
+                <td>
+                    <button class="btn btn-sm btn-secondary custom-button" id="@Model.DoctorList[k].PersonGUIDfld" 
+                    onclick="window.location = '@Url.Action("UserDetails","MediApp",new {personGuid = @Model.DoctorList[k].PersonGUIDfld })'">
+                        <i class="bx bxs-edit"></i>
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-secondary  custom-button btnDocumentView" id="@Model.DoctorList[k].PersonGUIDfld">
+                        <i class="bx bxs-file-doc"></i>
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-secondary  custom-button btnUploadDocument" 
+id="@Model.DoctorList[k].PersonGUIDfld">
+                        <i class="bx bxs-plus-circle"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<br />
+<div id="hiddenDoctorTable">
+    @for (int k = 0; k < Model.DoctorList.Count; k++)
+    {
+        <div class="card shadow">
+            <div class="card-body">
+                <table class="table table-sm table-border-horizontal">
+                    <tbody>
+                        <tr>
+                            <td width="50%"><label class="col-form-label">First Name</label></td>
+                            <td><label class="col-form-label">@Model.DoctorList[k].FirstNamefld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Last Name</label></td>
+                            <td><label class="col-form-label">@Model.DoctorList[k].LastNamefld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">ID</label></td>
+                            <td><label class="col-form-label">@Model.DoctorList[k].IDNumberfld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Contact</label></td>
+                            <td><label class="col-form-label">@Model.DoctorList[k].Contactfld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Email</label></td>
+                            <td><label class="col-form-label">@Model.DoctorList[k].Emailfld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Detail</label></td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary custom-button" id="@Model.DoctorList[k].PersonGUIDfld" 
+                                onclick="window.location = '@Url.Action("UserDetails","MediApp",new {personGuid = @Model.DoctorList[k].PersonGUIDfld })'">
+                                <i class="bx bxs-edit"></i>
+                            </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Documents</label></td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary  custom-button btnDocumentView" id="@Model.DoctorList[k].PersonGUIDfld">
+                                    <i class="bx bxs-file-doc"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Add Document</label></td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary  custom-button btnUploadDocument" id="@Model.DoctorList[k].PersonGUIDfld">
+                                    <i class="bx bxs-plus-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+</div>
+
+<div class="modal fade" id="doctorAttachmentModal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="doctorAttachmentModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="doctorAttachmentModalLabel">Attachments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="doctorModal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="doctorModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header ">
+                <h5 class="modal-title" id="doctorModalLabel">Add Doctor <label class="lblError text-danger"></label></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                    @Html.HiddenFor(m => m.UserTypeGUIDfld)
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-border-horizontal " width="100%">
+                                <tbody>
+                                     <tr>
+                                        <td><label class="col-form-label" for="firstName">First Name</label></td>
+                                        <td> <input asp-for="FirstNamefld" type="text" class="form-control "  /> </td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="col-form-label" for="lastName">Last Name</label></td>
+                                        <td> <input asp-for="LastNamefld" type="text" class="form-control "  /></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="col-form-label" for="contact">Contact</label></td>
+                                        <td>
+                                            <input asp-for="Contactfld" type="text" class="form-control " maxlength="10"  />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="col-form-label" for="ID">ID No.</label></td>
+                                        <td>
+                                            <input asp-for="IDNumberfld" type="text" class="form-control" maxlength="13"  />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><label class="col-form-label" for="ID">Email</label></td>
+                                        <td>
+                                            <input asp-for="Emailfld" type="text" class="form-control" required />
+                                        </td>
+                                    </tr>
+                                    
+                                       <tr>
+                                        <td><label class="col-form-label" for="PracticeNamefld">Address</label></td>
+                                        <td>
+                                            <textarea asp-for="Addressfld" type="text" rows="3" class="form-control"  ></textarea>
+                                        </td>
+                                    </tr>   
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-border-horizontal " width="100%">
+                                <tbody>
+                                     <tr>
+                                        <td><label class="col-form-label" for="RegistrationNumberfld">Practice Registration</label></td>
+                                        <td>
+                                            <input asp-for="PracticeRegistration" type="text" class="form-control"  />
+                                        </td>
+                                    </tr>
+                                       
+                                    <tr>
+                                        <td><label class="col-form-label" for="PracticeNamefld">Practice Name</label></td>
+                                        <td>
+                                            <input asp-for="PracticeNamefld" type="text" class="form-control"  />
+                                        </td>
+                                    </tr>
+                                            
+                                        
+                                    <tr>
+                                        <td><label class="col-form-label" for="PracticeNamefld">Practice Address</label></td>
+                                        <td>
+                                            <textarea asp-for="PracticeAddressfld" type="text" rows="3" class="form-control"  ></textarea>
+                                        </td>
+                                    </tr>   
+                                
+                        </tbody>
+                           
+                    </table>
+                </div>
+                   
+            </div>
+
+                 
+            <div class="row p-3">
+                        
+                <button class="btn btn-sm btn-secondary ml-2" style="width:120px" id="btnCreateDoctor" type="submit">Submit</button>
+                    
+            </div>
+                
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+   
+<div class="modal fade" id="documentViewModal"
+     data-bs-keyboard="false"
+     tabindex="-1"
+     aria-labelledby="documentViewModalModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentViewModalModalLabel">Attachments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body"> </div>
+        </div>
+    </div>
+</div>
+
+ <div class="modal fade" id="successModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="successdModalLabel"          
+      aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successdModalLabel">Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="~/tick2.png" width="200"/></td>
+                                <td>                    
+                                    <h5 id="successLabel">Doctor created successfully</h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" style="width:120px" id="btnDone" >Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+          <div class="modal fade" id="errordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="userCreatedModalLabel"          
+      aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userCreatedModalLabel">Error</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="~/error.png" width="200"/></td>
+                                <td>                    
+                                    <h5 id="errorLabel">Oop... something went wrong</h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" style="width:120px" id="btnErrorDone" >Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+        
+    <div class="modal fade" id="warningModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-
+
+        labelledby="warningModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="warningModalLabel">Warning</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                     <table>
+                        <tbody>
+                            <tr>
+                                <td><img src="~/warningIcon.png" width="200" /></td>
+                                <td>                    
+                                    <h5 id="warningMessagelbl"></h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" style="width:120px" id="donebtn" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="documentUploadModal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="documentModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentModalLabel">Add Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body"> 
+                
+            
+            
+            
+            
+            
+            
+            
+            
+            </div>
+        </div>
+    </div>
+</div>

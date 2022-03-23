@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\nkosinathim\Desktop\UI Deploy Files</_PublishTargetUrl>
+    <History>False|2022-03-12T06:07:03.8859302Z;False|2022-03-12T08:05:04.2272526+02:00;False|2022-03-12T07:58:58.6534596+02:00;False|2022-03-12T07:44:09.3447958+02:00;False|2022-03-12T07:39:57.5104606+02:00;True|2022-02-25T10:19:39.7084914+02:00;True|2022-02-25T10:10:53.2263265+02:00;True|2022-02-25T10:04:38.1857949+02:00;True|2022-02-24T14:49:51.4371407+02:00;True|2022-02-24T14:34:55.8057517+02:00;True|2022-02-24T14:26:43.9936144+02:00;True|2022-02-24T11:58:18.0974118+02:00;True|2022-02-24T11:35:30.8822270+02:00;True|2022-02-24T11:32:59.9059190+02:00;True|2022-02-24T11:21:20.2276813+02:00;True|2022-01-28T16:37:10.8222771+02:00;True|2022-01-28T11:41:02.2971671+02:00;True|2022-01-28T11:23:00.1768667+02:00;True|2022-01-28T10:33:54.6891691+02:00;True|2022-01-28T09:41:52.2748701+02:00;True|2022-01-25T12:36:31.4480153+02:00;</History>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+  </PropertyGroup>
+</Project>

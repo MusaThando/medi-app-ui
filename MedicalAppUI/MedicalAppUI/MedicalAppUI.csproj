@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+    <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
+    <PackageReference Include="XAct.Core.PCL" Version="0.0.5014" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Assests\js\editor\ckeditor\plugins\a11yhelp\dialogs\lang\" />
+    <Folder Include="wwwroot\Assests\js\editor\ckeditor\plugins\about\dialogs\hidpi\" />
+    <Folder Include="wwwroot\Assests\js\editor\ckeditor\plugins\link\images\hidpi\" />
+    <Folder Include="wwwroot\Assests\js\editor\ckeditor\plugins\magicline\images\hidpi\" />
+    <Folder Include="wwwroot\Assests\js\editor\ckeditor\plugins\scayt\skins\moono-lisa\" />
+    <Folder Include="wwwroot\Assests\js\editor\ckeditor\plugins\specialchar\dialogs\lang\" />
+    <Folder Include="wwwroot\Assests\js\editor\ckeditor\plugins\templates\templates\images\" />
+    <Folder Include="wwwroot\Assests\js\editor\ckeditor\plugins\wsc\skins\moono-lisa\" />
+    <Folder Include="wwwroot\Assests\js\editor\ckeditor\skins\moono-lisa\images\hidpi\" />
+    <Folder Include="wwwroot\Images\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+</Project>

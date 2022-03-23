@@ -1,0 +1,188 @@
+﻿@model MedicalAppUI.Models.CDocumentRepository
+@{
+    ViewBag.Title = "Documents";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+
+    $(document).on("click", ".btnUploadDocument", function () {
+          var personGuid = $(this).attr("id");
+
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetDocumentUpload", "Management")',
+            data: { personGuid: personGuid },
+            success: function (response) {
+                $(".modal-body").html(response);
+                $('#documentModal').modal("show");
+            }
+        });
+
+    });
+    $(document).ready(function () {
+        //$("#customSelection").select2();
+
+        $('#DocumentTable').DataTable({
+            "pagingType": 'full',
+            "searching": true,
+            "lengthMenu": [10],
+            ordering: false,
+            "lengthChange": false,
+            "info": false
+        });
+    });
+</script>
+<style>
+    .btnUploadDocument {
+        background: #198754;
+        color: white;
+    }
+
+    #hiddenDocumentTable {
+        display: none;
+    }
+    table.dataTable.table thead th, table.dataTable.table thead td {
+        position: relative;
+        color: white;
+        background: #214A7A;
+    }
+    .table > :not(:last-child) > :last-child > * {
+        border-bottom: 4px solid red;
+    }
+    @@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+        #DocumentTable, #DocumentTable_wrapper {
+            display: none
+        }
+
+        #hiddenDocumentTable {
+            display: block
+        }
+    }
+</style>
+
+<br />
+<button class="btn btnUploadDocument"><i class="bx bx-plus"></i>Add Document</button>
+<br />
+<br />
+<table class="table table-sm table-border-horizontal" id="DocumentTable">
+    <thead>
+        <tr >
+            <th>#</th>
+            <th>File Name</th>
+            <th>Size</th>
+            <th>Download</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int k = 0; k < Model.DocumentList.Count; k++)
+        {
+            <tr >
+                <td ><label class="col-form-label">@Model.DocumentList[k].IDfld      </label></td>
+                <td ><label class="col-form-label">@Model.DocumentList[k].FileNamefld</label></td>
+                <td ><label class="col-form-label">@Model.DocumentList[k].Size MB    </label></td>
+                <td >
+                    <button class="btn btn-sm btn-secondary" onclick="window.location = '@Url.Action("DownloadDocument","MediApp",new {documentRepository = @Model.DocumentList[k].DocumentRepositoryGUIDfld  })'"><i class="bx bxs-cloud-download"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<br />
+<div id="hiddenDocumentTable">
+    @for (int k = 0; k < Model.DocumentList.Count; k++)
+    {
+        <div class="card shadow">
+            <div class="card-body">
+                <table class="table table-sm table-border-horizontal">
+                    <tbody>
+                        <tr>
+                            <td width="50%"><label class="col-form-label">First Name</label></td>
+                            <td><label class="col-form-label">@Model.DocumentList[k].IDfld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Last Name</label></td>
+                            <td><label class="col-form-label">@Model.DocumentList[k].FileNamefld</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">ID</label></td>
+                            <td><label class="col-form-label">@Model.DocumentList[k].Size MB</label></td>
+                        </tr>
+                        <tr>
+                            <td><label class="col-form-label">Download</label></td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary" onclick="window.location = '@Url.Action("DownloadDocument","MediApp",new {documentRepository = @Model.DocumentList[k].DocumentRepositoryGUIDfld  })'"><i class="bx bxs-cloud-download"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="documentModal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="documentModalLabel">
+    <div class="modal-dialog modal-dialog-centered modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="documentModalLabel">Add Document</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body"> 
+
+
+                  <form  asp-action="CreateUserDocument" asp-controller="MediApp"  method="post" enctype ="multipart/form-data">
+            
+        @Html.HiddenFor(m => m.SourceRecordGUIDfld)
+
+        <table class="table table-border-horizontal " width="100%">
+            <tbody>
+                @if (ViewBag.UserType == "User")
+                {
+                    @Html.HiddenFor(m => m.Publicfld)
+                    <tr>
+                        <td>
+                            <label class="col-form-label">File</label>
+                        </td>
+                        <td>
+                            <input class="form-control" asp-for="File" type = "file" id = "userFile">
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>
+                            <span class="col-form-label">Public</span>
+                            <input class = "publicCheck"  asp-for="Publicfld" type = "checkbox" >
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label class="col-form-label">File</label>
+                        </td>
+                        <td>
+                            <input class="form-control" asp-for="File" type = "file" id = "userFile">
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="row p-3">
+            <button class="btn btn-sm btn-secondary ml-2" style="width:120px" id="btnAddDocument" type="submit">Submit</button>
+        </div>
+    </form>
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,115 @@
+﻿@model MedicalAppUI.Models.CUsers
+@{
+    ViewBag.Title = "User Details";
+}
+
+<style>
+    .tableHeader {
+        background: #214A7A;
+        color: white;
+        border-bottom: 4px solid #d9534f;
+        padding: 5px;
+    }
+</style>
+<script>
+
+    function getAdmin()
+    {
+        window.location = '/MediApp/Administration';
+    }
+
+    function getUsers()
+    {
+        window.location = '/MediApp/Users';
+
+    }
+
+    function getDoctors()
+    {
+        window.location = '/MediApp/Doctors';
+
+    }
+
+
+
+</script>
+
+<br />
+
+
+@if (@Model.UserTypeGUIDfld == Guid.Parse("7BE8F6AD-8B8F-411D-9FE3-1DFD94207034"))
+{
+    <button class="btn btn-sm btn-outline-secondary-2x " onclick="getUsers()">Back</button>
+    <br />
+    <br />
+}
+else if (@Model.UserTypeGUIDfld == Guid.Parse("CA8BF789-875E-441A-B751-9BA336738091"))
+{
+    <button class="btn btn-sm btn-outline-secondary-2x" onclick="getAdmin()">Back</button>
+    <br />
+    <br />
+}
+else
+{
+    
+    <button class="btn btn-sm btn-outline-secondary-2x" onclick="getDoctors()">Back</button>
+    <br />
+    <br />
+}
+
+<section>
+    <div class="jumbotron-fluid tableHeader  ">
+        <label class="text-uppercase col-form-label" style="font-size: medium">Personal Information</label>
+    </div>
+    <table class="table table-border-horizontal shadow ">
+        <tbody class="bg-white">
+            <tr>
+                <td><label class="col-form-label" for="firstName">First Name</label></td>
+                <td>@Html.TextBoxFor(m => m.FirstNamefld, new { @class = "form-control ", @readonly = true }) </td>
+            </tr>
+            <tr>
+                <td><label class="col-form-label" for="lastName">Last Name</label></td>
+                <td>@Html.TextBoxFor(m => m.LastNamefld, new { @class = "form-control ", @readonly = true }) </td>
+            </tr>
+            <tr>
+                <td><label class="col-form-label" for="contact">Contact Number</label></td>
+                <td>@Html.TextBoxFor(m => m.Contactfld, new { @class = "form-control", maxlengh = "10" }) </td>
+            </tr>
+            <tr>
+                <td><label class="col-form-label" for="address">Address</label></td>
+                <td>@Html.TextAreaFor(m => m.Addressfld, new { @class = "form-control", rows = "3" }) </td>
+
+            </tr>
+            <tr>
+                <td><label class="col-form-label" for="ID">ID No.</label></td>
+                <td>@Html.TextBoxFor(m => m.IDNumberfld, new { @class = "form-control", maxlengh = "13", @readonly = true }) </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+</section>
+<br />
+<section>
+    <div class="jumbotron-fluid  tableHeader ">
+        <label class="text-uppercase col-form-label" style="font-size:medium">Medical Aid Information</label>
+    </div>
+    <table class="table table-border-horizontal shadow ">
+        <tbody class="bg-white">
+            <tr>
+                <td><label class="col-form-label" for="medicalAid">Medical Aid No.</label></td>
+                <td>@Html.TextBoxFor(m => m.MedicalAidNumberfld, new { @class = "form-control" }) </td>
+            </tr>
+            <tr>
+                <td><label class="col-form-label" for="medicalPlan">Medical Aid Plan</label></td>
+                <td>@Html.TextBoxFor(m => m.MedicalAidPlanfld, new { @class = "form-control" }) </td>
+            </tr>
+            <tr>
+                <td><label class="col-form-label" for="email">Contact</label></td>
+                <td>@Html.TextBoxFor(m => m.MedicalAidContactfld, new { @class = "form-control" }) </td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+<br />
+<br />
